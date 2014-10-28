@@ -1,0 +1,15 @@
+---
+# Download composer from getcomposer.org
+- command: curl -sS https://getcomposer.org/installer | php
+  tags:
+    - composer
+
+# Make sure there is a ~/bin folder
+- file: path=~/bin ensure=directory
+  tags:
+    - composer
+
+# Move composer.phar to ~/bin
+- command: mv ~/composer.phar ~/bin/composer.phar
+  tags:
+    - composer
