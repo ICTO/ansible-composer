@@ -4,8 +4,13 @@
   tags:
     - composer
 
+- name: "Install php5-cli"
+  apt: name=php5-cli state=installed
+  sudo: yes
+  sudo_user: root
+
 # Install composer
-- command: php install-composer.php
+- command: php install-composer.php chdir=~
   tags:
     - composer
 
