@@ -10,7 +10,9 @@
   sudo_user: root
 
 # Install composer
-- command: php install-composer.php chdir=~
+- command: php install-composer.php
+  args:
+    chdir: ~/
   tags:
     - composer
 
