@@ -1,22 +1,48 @@
 ---
-# Download composer from getcomposer.org
-- get_url: url=https://getcomposer.org/installer dest=~/install-composer.php
-  tags:
-    - composer
-
-# Install composer
-- command: php install-composer.php
-  args:
-    chdir: ~/
-  tags:
-    - composer
-
 # Make sure there is a ~/bin folder
-- file: path=~/bin state=directory
+- name: Create a bin folder in users' home
+  file:
+    path: ~/bin
+    state: directory
   tags:
     - composer
 
-# Move composer.phar to ~/bin
-- command: mv ~/composer.phar ~/bin/composer
+# Check if already installed
+- name: Check for composer presence
+  stat:
+    path: ~/bin/composer.phar
+  register: st
+  tags:
+    - composer
+
+- block:
+    # Download composer from getcomposer.org
+    - name: Get composer installer
+      get_url:
+        url: https://getcomposer.org/installer
+        dest: ~/install-composer.php
+
+    # Install composer
+    - name: Run composer installer
+      command: php install-composer.php --install-dir=./bin
+      args:
+        chdir: ~/
+        creates: ~/bin/composer.phar
+  when: st.stat.isreg is not defined
+  tags:
+    - composer
+
+- name: Create symlink between composer.phar and composer
+  file:
+    src: ~/bin/composer.phar
+    dest: ~/bin/composer
+    state: link
+  tags:
+    - composer
+
+- name: Selfupdate composer
+  command: php ~/bin/composer.phar self-update
+  register: command_result
+  changed_when: "'You are already using composer version' not in command_result.stderr"
   tags:
     - composer
